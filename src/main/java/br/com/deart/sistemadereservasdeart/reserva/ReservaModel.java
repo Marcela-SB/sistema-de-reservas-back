@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+
 import br.com.deart.sistemadereservasdeart.enums.Courses;
 import br.com.deart.sistemadereservasdeart.excecao.ExcecaoModel;
 import jakarta.annotation.Nullable;
@@ -41,6 +44,7 @@ public class ReservaModel {
     @Nullable
     private String comment;
 
+    @Enumerated(EnumType.STRING)
     private Courses course;
 
     @Nullable
