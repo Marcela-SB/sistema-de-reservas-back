@@ -35,6 +35,9 @@ public class SalaModel {
     private boolean administrative;
 
     @Nullable
+    private UUID responsibleId;
+
+    @Nullable
     private String comment;
     
     public void setCapacity(Integer capacidade) throws Exception{
