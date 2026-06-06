@@ -6,7 +6,10 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @CrossOrigin
@@ -31,8 +34,17 @@ public class AutorizacoesModel {
     @CreationTimestamp
     private LocalDateTime creationDate;
 
+    // LocalDate
     private LocalDateTime authorizationStart;
     private LocalDateTime authorizationEnd;
+
+    @Nullable
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime startTime;
+    
+    @Nullable
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime endTime;
 
     @Nullable
     @Column(columnDefinition = "TEXT")
