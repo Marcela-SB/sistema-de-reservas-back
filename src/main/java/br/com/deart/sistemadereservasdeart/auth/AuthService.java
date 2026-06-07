@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import br.com.deart.sistemadereservasdeart.exceptions.domain.CpfAlreadyExistsException;
 import br.com.deart.sistemadereservasdeart.services.JwtService;
 import br.com.deart.sistemadereservasdeart.user.IUserRepository;
 import br.com.deart.sistemadereservasdeart.user.RoleModel;
@@ -30,6 +31,10 @@ public class AuthService {
                         .password(encoder.encode(request.getPassword()))
                         .role(request.getRole())
                         .build();
+        
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new CpfAlreadyExistsException(user.getUsername());
+        }
         userRepository.save(user);
         var jwtToken = jwtService.generateToken( user);
         return AuthenticationResponse.builder()
