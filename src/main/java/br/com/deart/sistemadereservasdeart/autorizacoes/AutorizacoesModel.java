@@ -39,11 +39,9 @@ public class AutorizacoesModel {
     private LocalDateTime authorizationEnd;
 
     @Nullable
-    @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
     
     @Nullable
-    @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
     @Nullable
