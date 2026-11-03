@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import br.com.deart.sistemadereservasdeart.exceptions.domain.CpfAlreadyExistsException;
 import br.com.deart.sistemadereservasdeart.services.JwtService;
 import br.com.deart.sistemadereservasdeart.user.IUserRepository;
-import br.com.deart.sistemadereservasdeart.user.RoleModel;
+import br.com.deart.sistemadereservasdeart.user.UserRole;
 import br.com.deart.sistemadereservasdeart.user.UserModel;
 import lombok.RequiredArgsConstructor;
 

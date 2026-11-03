@@ -1,6 +1,6 @@
 package br.com.deart.sistemadereservasdeart.auth;
 
-import br.com.deart.sistemadereservasdeart.user.RoleModel;
+import br.com.deart.sistemadereservasdeart.user.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +17,6 @@ public class RegisterRequest {
     private String password;
     private String email;
     private String registration;
-    private RoleModel role;
+    private UserRole role;
 
 }

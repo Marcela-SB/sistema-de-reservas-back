@@ -1,8 +1,11 @@
 package br.com.deart.sistemadereservasdeart.user;
 
-public enum RoleModel {
+public enum UserRole {
     USER,
-    TRAINEE,
+    STUDENT,
+    PROFESSOR,
+    STAFF,
+    TRAINEE, //ou SCHOLAR?
     SUPERVISOR,
     ADMIN
 }

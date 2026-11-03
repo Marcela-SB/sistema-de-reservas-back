@@ -38,7 +38,7 @@ public class UserModel implements UserDetails{
     private String registration;
 
     @Enumerated(EnumType.STRING)
-    private RoleModel role;
+    private UserRole role;
     
     @Builder.Default
     @Column(nullable = false, columnDefinition = "boolean default true")
