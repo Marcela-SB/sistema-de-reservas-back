@@ -144,6 +144,14 @@ public class EntregaDeChaveController {
 
     @PostMapping("/return")
     public ResponseEntity<KeyReturnBatchResponseDTO> returnMultipleKeys(@RequestBody KeyReturnBatchRequestDTO dto) {
+        // Valida se a lista de IDs é nula ou vazia
+        if (dto.keyIds() == null || dto.keyIds().isEmpty()) {
+            return ResponseEntity.badRequest().body(new KeyReturnBatchResponseDTO(
+                new ArrayList<>(), 
+                List.of(new KeyErrorDetail(null, "A lista de IDs das chaves não pode ser nula ou vazia."))
+            ));
+        }
+        
         List<UUID> successIds = new ArrayList<UUID>();
         List<KeyErrorDetail> errors = new ArrayList<>();
 
