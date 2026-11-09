@@ -1,5 +1,10 @@
 package br.com.deart.sistemadereservasdeart.entregadechave;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.deart.sistemadereservasdeart.sala.ISalaRepository;
+import br.com.deart.sistemadereservasdeart.sala.SalaModel;
 import br.com.deart.sistemadereservasdeart.user.IUserRepository;
 import br.com.deart.sistemadereservasdeart.util.PutTools;
 import jakarta.servlet.http.HttpServletRequest;
@@ -93,7 +99,6 @@ public class EntregaDeChaveController {
     @PutMapping("/edit/{keyDeliveryId}")
     public ResponseEntity editRoom(HttpServletRequest request, @RequestBody EntregaDeChaveModel entregaDeChaveModel, @PathVariable UUID keyDeliveryId){
 
-
         var keyDeliveryToChange = this.entregaDeChaveRepository.findById(keyDeliveryId).orElse(null);
 
         if (keyDeliveryToChange == null){
@@ -136,4 +141,59 @@ public class EntregaDeChaveController {
 
         return ResponseEntity.status(202).body(updatedKeyDelivery);
     }
+
+    @PostMapping("/return")
+    public ResponseEntity<KeyReturnBatchResponseDTO> returnMultipleKeys(@RequestBody KeyReturnBatchRequestDTO dto) {
+        List<UUID> successIds = new ArrayList<UUID>();
+        List<KeyErrorDetail> errors = new ArrayList<>();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+        LocalDateTime parsedReturnTime = dto.returnTime() != null 
+            ? LocalDateTime.parse(dto.returnTime(), formatter) 
+            : LocalDateTime.now();
+
+        // Valida se o usuário que está devolvendo existe (opcional, mas recomendado)
+        if (dto.keyReturnedById() != null && !userRepository.existsById(dto.keyReturnedById())) {
+            return ResponseEntity.badRequest().body(new KeyReturnBatchResponseDTO(
+                new ArrayList<>(), 
+                List.of(new KeyErrorDetail(null, "Usuário responsável pela devolução não encontrado."))
+            ));
+        }
+
+        // Itera sobre cada ID enviado no lote
+        for (UUID keyId : dto.keyIds()) {
+            try {
+                Optional<EntregaDeChaveModel> optionalKey = entregaDeChaveRepository.findById(keyId);
+                
+                if (optionalKey.isEmpty()) {
+                    throw new RuntimeException("A Chave não foi encontrado.");
+                }
+
+                EntregaDeChaveModel keyDelivery = optionalKey.get();
+
+                // Verifica se já foi devolvida para evitar duplicidade desnecessária
+                if (Boolean.TRUE.equals(keyDelivery.getIsKeyReturned())) {
+                    SalaModel sala = salaRepository.findById(keyDelivery.getRoomId()).orElse(null);
+                    throw new RuntimeException("Chave da sala '" + sala.getName() + " - "+ sala.getRoomNumber() +"' já havia sido devolvida anteriormente.");
+                }
+
+                // Atualiza os dados diretamente no modelo/entidade
+                keyDelivery.setIsKeyReturned(true);
+                keyDelivery.setKeyReturnedById(dto.keyReturnedById());
+                keyDelivery.setReturnTime(parsedReturnTime);
+
+                // Salva individualmente
+                entregaDeChaveRepository.save(keyDelivery);
+                
+                successIds.add(keyId);
+
+            } catch (Exception e) {
+                // Se uma chave falhar, captura o erro, registra no array de erros e continua o loop para as próximas
+                errors.add(new KeyErrorDetail(keyId, e.getMessage()));
+            }
+        }
+
+        return ResponseEntity.ok(new KeyReturnBatchResponseDTO(successIds, errors));
+    }
+    
 }
